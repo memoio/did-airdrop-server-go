@@ -1,0 +1,141 @@
+basePath: /
+definitions:
+  router.CreateDIDResponse:
+    properties:
+      did:
+        type: string
+    type: object
+  router.DIDInfo:
+    properties:
+      address:
+        type: string
+      balance:
+        type: number
+      chain:
+        type: string
+    type: object
+  router.DeleteDIDResponse:
+    properties:
+      did:
+        type: string
+      status:
+        type: string
+    type: object
+  router.Error:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  router.GetDIDInfoResponse:
+    properties:
+      did:
+        type: string
+      info:
+        items:
+          $ref: '#/definitions/router.DIDInfo'
+        type: array
+    type: object
+host: 119.147.213.61:38082
+info:
+  contact: {}
+  description: This is a data market server.
+  title: Data-Market API
+  version: "1.0"
+paths:
+  /did/create:
+    post:
+      consumes:
+      - application/json
+      description: CreateDID
+      parameters:
+      - description: signature
+        in: body
+        name: sig
+        required: true
+        schema:
+          type: string
+      - description: chain
+        in: body
+        name: chain
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.CreateDIDResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/router.Error'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/router.Error'
+      tags:
+      - DID
+  /did/delete:
+    post:
+      consumes:
+      - application/json
+      description: DeleteDID
+      parameters:
+      - description: signature
+        in: body
+        name: sig
+        required: true
+        schema:
+          type: string
+      - description: did
+        in: body
+        name: did
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.DeleteDIDResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/router.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/router.Error'
+      tags:
+      - DID
+  /did/info:
+    get:
+      consumes:
+      - application/json
+      description: GetDIDInfo
+      parameters:
+      - description: did
+        in: query
+        name: did
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.GetDIDInfoResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/router.Error'
+      tags:
+      - DID
+swagger: "2.0"
