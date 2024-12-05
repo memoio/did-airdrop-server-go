@@ -1,53 +1,67 @@
 package did
 
 import (
-	"github.com/nuts-foundation/did-ockam"
-	"golang.org/x/xerrors"
+	"context"
+	"encoding/binary"
+	"encoding/hex"
+
+	"github.com/did-server/internal/contract"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/go-kratos/kratos/v2/log"
+
+	com "github.com/memoio/contractsv2/common"
+	"github.com/memoio/go-did/types"
 )
 
 type MemoDID struct {
-	Method string
-
-	Identifier string
-
-	Identifiers []string
+	Controller *contract.Controller
+	chain      string
+	logger     *log.Helper
 }
 
-func ParseMemoDID(didStr string) (*MemoDID, error) {
-	did, err := did.Parse(didStr)
+func NewMemoDID(chain string, logger *log.Helper) (*MemoDID, error) {
+	controller, err := contract.NewController(chain)
 	if err != nil {
 		return nil, err
 	}
-	if did.IsURL() {
-		return nil, xerrors.Errorf("%s is did url", didStr)
-	}
-	if did.Method != "memo" {
-		return nil, xerrors.Errorf("unsupported method %s", did.Method)
-	}
-	if len(did.IDStrings) > 1 {
-		// TODO: check didString[2:len(didStrings)-1] ==? {chain id}
-		return nil, xerrors.Errorf("TODO: support chain id")
-	}
-	if isNot32ByteHex(did.IDStrings[len(did.IDStrings)-1]) {
-		return nil, xerrors.Errorf("%s is not 32 byte hex string", did.IDStrings[len(did.IDStrings)-1])
-	}
+
 	return &MemoDID{
-		Method:      "memo",
-		Identifier:  did.ID,
-		Identifiers: did.IDStrings,
+		Controller: controller,
+		chain:      chain,
+		logger:     logger,
 	}, nil
 }
 
-func isNot32ByteHex(s string) bool {
-	if len(s) != 64 {
-		return true
+// Create unregistered DID
+func (m *MemoDID) CreateDID(chain, publicKeyStr string) (*types.MemoDID, error) {
+	_, endpoint := com.GetInsEndPointByChain(chain)
+
+	client, err := ethclient.DialContext(context.TODO(), endpoint)
+	if err != nil {
+		m.logger.Error(err)
+		return nil, err
+	}
+	defer client.Close()
+
+	publicKeyECDSA, err := m.publickeyFromString(publicKeyStr)
+	if err != nil {
+		m.logger.Error(err)
+		return nil, err
 	}
 
-	for _, b := range s {
-		if !((b >= '0' && b <= '9') || (b >= 'a' && b <= 'f') || (b >= 'A' && b <= 'F')) {
-			return true
-		}
+	address := crypto.PubkeyToAddress(*publicKeyECDSA)
+	nonce, err := client.PendingNonceAt(context.TODO(), address)
+	if err != nil {
+		m.logger.Error(err)
+		return nil, err
 	}
 
-	return false
+	identifier := hex.EncodeToString(crypto.Keccak256(binary.AppendUvarint(address.Bytes(), nonce)))
+
+	return &types.MemoDID{
+		Method:      "memo",
+		Identifier:  identifier,
+		Identifiers: []string{identifier},
+	}, nil
 }

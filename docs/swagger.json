@@ -1,12 +1,12 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a data market server.",
-        "title": "Data-Market API",
+        "description": "This is a did server.",
+        "title": "DID-Server API",
         "contact": {},
         "version": "1.0"
     },
-    "host": "119.147.213.61:38082",
+    "host": "localhost:8080",
     "basePath": "/",
     "paths": {
         "/did/create": {
@@ -23,17 +23,8 @@
                 ],
                 "parameters": [
                     {
-                        "description": "signature",
+                        "description": "user signature",
                         "name": "sig",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "chain",
-                        "name": "chain",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -63,6 +54,44 @@
                 }
             }
         },
+        "/did/createsigmsg": {
+            "get": {
+                "description": "GetCreateSigMsg",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "DID"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "The signature of the chain",
+                        "name": "chain",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "publicKey",
+                        "name": "publicKey",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/router.GetSigMsgResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/did/delete": {
             "post": {
                 "description": "DeleteDID",
@@ -77,7 +106,7 @@
                 ],
                 "parameters": [
                     {
-                        "description": "signature",
+                        "description": "user signature",
                         "name": "sig",
                         "in": "body",
                         "required": true,
@@ -117,6 +146,37 @@
                 }
             }
         },
+        "/did/deletesigmsg": {
+            "get": {
+                "description": "GetDeleteSigMsg",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "DID"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user did",
+                        "name": "did",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/router.GetSigMsgResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/did/info": {
             "get": {
                 "description": "GetDIDInfo",
@@ -132,7 +192,7 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "did",
+                        "description": "user did",
                         "name": "did",
                         "in": "query",
                         "required": true
@@ -211,6 +271,14 @@
                     "items": {
                         "$ref": "#/definitions/router.DIDInfo"
                     }
+                }
+            }
+        },
+        "router.GetSigMsgResponse": {
+            "type": "object",
+            "properties": {
+                "msg": {
+                    "type": "string"
                 }
             }
         }

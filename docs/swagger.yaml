@@ -37,11 +37,16 @@ definitions:
           $ref: '#/definitions/router.DIDInfo'
         type: array
     type: object
-host: 119.147.213.61:38082
+  router.GetSigMsgResponse:
+    properties:
+      msg:
+        type: string
+    type: object
+host: localhost:8080
 info:
   contact: {}
-  description: This is a data market server.
-  title: Data-Market API
+  description: This is a did server.
+  title: DID-Server API
   version: "1.0"
 paths:
   /did/create:
@@ -50,15 +55,9 @@ paths:
       - application/json
       description: CreateDID
       parameters:
-      - description: signature
+      - description: user signature
         in: body
         name: sig
-        required: true
-        schema:
-          type: string
-      - description: chain
-        in: body
-        name: chain
         required: true
         schema:
           type: string
@@ -79,13 +78,38 @@ paths:
             $ref: '#/definitions/router.Error'
       tags:
       - DID
+  /did/createsigmsg:
+    get:
+      consumes:
+      - application/json
+      description: GetCreateSigMsg
+      parameters:
+      - description: The signature of the chain
+        in: query
+        name: chain
+        required: true
+        type: string
+      - description: publicKey
+        in: query
+        name: publicKey
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.GetSigMsgResponse'
+      tags:
+      - DID
   /did/delete:
     post:
       consumes:
       - application/json
       description: DeleteDID
       parameters:
-      - description: signature
+      - description: user signature
         in: body
         name: sig
         required: true
@@ -114,13 +138,33 @@ paths:
             $ref: '#/definitions/router.Error'
       tags:
       - DID
+  /did/deletesigmsg:
+    get:
+      consumes:
+      - application/json
+      description: GetDeleteSigMsg
+      parameters:
+      - description: user did
+        in: query
+        name: did
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.GetSigMsgResponse'
+      tags:
+      - DID
   /did/info:
     get:
       consumes:
       - application/json
       description: GetDIDInfo
       parameters:
-      - description: did
+      - description: user did
         in: query
         name: did
         required: true

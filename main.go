@@ -2,10 +2,10 @@ package main
 
 import "github.com/did-server/cmd"
 
-// @title			Data-Market API
+// @title			DID-Server API
 // @version		1.0
-// @description	This is a data market server.
-// @Host			119.147.213.61:38082
+// @description	This is a did server.
+// @Host			localhost:8080
 // @BasePath		/
 func main() {
 	cmd.Exceute()

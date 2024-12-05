@@ -30,17 +30,8 @@ const docTemplate = `{
                 ],
                 "parameters": [
                     {
-                        "description": "signature",
+                        "description": "user signature",
                         "name": "sig",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "chain",
-                        "name": "chain",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -70,6 +61,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/did/createsigmsg": {
+            "get": {
+                "description": "GetCreateSigMsg",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "DID"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "The signature of the chain",
+                        "name": "chain",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "publicKey",
+                        "name": "publicKey",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/router.GetSigMsgResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/did/delete": {
             "post": {
                 "description": "DeleteDID",
@@ -84,7 +113,7 @@ const docTemplate = `{
                 ],
                 "parameters": [
                     {
-                        "description": "signature",
+                        "description": "user signature",
                         "name": "sig",
                         "in": "body",
                         "required": true,
@@ -124,6 +153,37 @@ const docTemplate = `{
                 }
             }
         },
+        "/did/deletesigmsg": {
+            "get": {
+                "description": "GetDeleteSigMsg",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "DID"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user did",
+                        "name": "did",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/router.GetSigMsgResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/did/info": {
             "get": {
                 "description": "GetDIDInfo",
@@ -139,7 +199,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "did",
+                        "description": "user did",
                         "name": "did",
                         "in": "query",
                         "required": true
@@ -220,6 +280,14 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "router.GetSigMsgResponse": {
+            "type": "object",
+            "properties": {
+                "msg": {
+                    "type": "string"
+                }
+            }
         }
     }
 }`
@@ -227,11 +295,11 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "119.147.213.61:38082",
+	Host:             "localhost:8080",
 	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "Data-Market API",
-	Description:      "This is a data market server.",
+	Title:            "DID-Server API",
+	Description:      "This is a did server.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

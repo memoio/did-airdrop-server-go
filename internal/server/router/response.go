@@ -25,3 +25,7 @@ type AddVerifyInfoResponse struct {
 
 type ChangeVerifyInfoResponse struct {
 }
+
+type GetSigMsgResponse struct {
+	Msg string `json:"msg"`
+}

@@ -29,6 +29,7 @@ import (
 var (
 	privatekey = "9b4fc2a14cbc63a0d338377413ca72949cbb2fd5be1b08844b4b5e332597d91e"
 	address    = "0x47D4f617A654337AFB121F455629fF7d92b670eA"
+	publickey  = "0x03ecc373891778bed36426ddcd682bf1e0b5a99a8d8534be05a000ddc4faaccea0"
 
 	walletPrivate = "7a71499718e02f0bef77a9a34cd8eca62a3c3964caf5c599c16855e6774953a1"
 )
@@ -72,6 +73,35 @@ func TestCreateSK(t *testing.T) {
 	t.Log(hexutil.Encode(privateKeyBytes))
 }
 
+func TestGetPublicKey(t *testing.T) {
+	privateKey, err := crypto.HexToECDSA(privatekey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	publicKey := privateKey.Public()
+	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+	if !ok {
+		t.Fatal("cannot assert type: publicKey is not of type *ecdsa.PublicKey")
+	}
+	publicKeyBytes := crypto.CompressPubkey(publicKeyECDSA)
+
+	t.Log(hexutil.Encode(publicKeyBytes))
+}
+
+func TestSignatureMsg(t *testing.T) {
+	privateKey, err := crypto.HexToECDSA(privatekey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	msg := hexutil.MustDecode("0x582594f99c594ff1b6a6c0af31bdce9c9a62637d4d461eb0c246b84ce7bb1b03")
+	sig, err := crypto.Sign(msg, privateKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(hexutil.Encode(sig))
+}
 func TestGetAddress(t *testing.T) {
 	privateKey, err := crypto.HexToECDSA(privatekey)
 	if err != nil {
