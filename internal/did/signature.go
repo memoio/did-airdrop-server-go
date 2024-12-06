@@ -16,7 +16,7 @@ func (m *MemoDID) GetCreateSignatureMassage(vchain, publickey string) (string, e
 		return "", err
 	}
 
-	nonce, err := m.Controller.GetNonce()
+	nonce, err := m.Controller.GetNonce(did.String())
 	if err != nil {
 		m.logger.Error(err)
 		return "", err
@@ -26,7 +26,7 @@ func (m *MemoDID) GetCreateSignatureMassage(vchain, publickey string) (string, e
 }
 
 func (m *MemoDID) GetDeleteSignatureMassage(did string) (string, error) {
-	nonce, err := m.Controller.GetNonce()
+	nonce, err := m.Controller.GetNonce(did)
 	if err != nil {
 		m.logger.Error(err)
 		return "", err
@@ -62,12 +62,12 @@ func (m *MemoDID) getCreateDIDHash(did, vchain, publickeyStr string, nonce uint6
 
 func (m *MemoDID) getDeleteDIDHash(did string, nonce uint64) (string, error) {
 	tmp8 := make([]byte, 8)
-	deactivate := make([]byte, 32)
+
 	binary.BigEndian.PutUint64(tmp8, nonce)
 
 	deleteDID := common.LeftPadBytes([]byte("deleteDID"), 32)
 	didByte := common.LeftPadBytes([]byte(did), 32)
-
+	deactivate := common.LeftPadBytes([]byte{1}, 32)
 	hash := crypto.Keccak256(
 		deleteDID,
 		didByte,

@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/go-kratos/kratos/v2/log"
 	com "github.com/memoio/contractsv2/common"
 	inst "github.com/memoio/contractsv2/go_contracts/instance"
 	"github.com/memoio/go-did/types"
@@ -22,13 +23,15 @@ type Controller struct {
 	privateKey    *ecdsa.PrivateKey
 	didTransactor *bind.TransactOpts
 	proxyAddr     common.Address
+	logger        *log.Helper
+	accountAddr   common.Address
 }
 
-func NewController(chain string) (*Controller, error) {
-	return NewControllerWithDID(chain)
+func NewController(chain string, logger *log.Helper) (*Controller, error) {
+	return NewControllerWithDID(chain, logger)
 }
 
-func NewControllerWithDID(chain string) (*Controller, error) {
+func NewControllerWithDID(chain string, logger *log.Helper) (*Controller, error) {
 	instanceAddr, endpoint := com.GetInsEndPointByChain(chain)
 
 	client, err := ethclient.DialContext(context.TODO(), endpoint)
@@ -57,6 +60,11 @@ func NewControllerWithDID(chain string) (*Controller, error) {
 		return nil, err
 	}
 
+	accountAddr, err := instanceIns.Instances(&bind.CallOpts{}, com.TypeAccountDid)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := bind.NewKeyedTransactorWithChainID(privateKey, chainID)
 	if err != nil {
 		return nil, err
@@ -70,6 +78,8 @@ func NewControllerWithDID(chain string) (*Controller, error) {
 		privateKey:    privateKey,
 		didTransactor: auth,
 		proxyAddr:     proxyAddr,
+		logger:        logger,
+		accountAddr:   accountAddr,
 	}, nil
 
 }

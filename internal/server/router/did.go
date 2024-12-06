@@ -60,7 +60,13 @@ func (h *handle) createDID(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(sig)
+	// did, err := h.did.RegisterDID(sig)
+	// if err != nil {
+	// 	h.logger.Error(err)
+	// 	c.JSON(ErrDIDCreateFailed.Code, ErrDIDCreateFailed)
+	// 	return
+	// }
+	h.logger.Info(sig)
 
 	c.JSON(200, CreateDIDResponse{DID: "did:memo:d687daa192ffa26373395872191e8502cc41fbfbf27dc07d3da3a35de57c2d96"})
 }

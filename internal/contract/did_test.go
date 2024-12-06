@@ -17,7 +17,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/memoio/go-did/memo"
 	"github.com/pkg/errors"
 	"golang.org/x/xerrors"
 
@@ -35,33 +34,9 @@ var (
 )
 
 var (
-	checkTxSleepTime = 6 // 先等待6s（出块时间加1）
-	nextBlockTime    = 5 // 出块时间5s
-)
-
-var (
 	errorSig     = []byte{0x08, 0xc3, 0x79, 0xa0} // Keccak256("Error(string)")[:4]
 	abiString, _ = abi.NewType("string", "", nil)
 )
-
-func TestCreateDID(t *testing.T) {
-	privateKey, err := crypto.HexToECDSA(privatekey)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	controller, err := memo.NewMemoDIDController(privateKey, "dev")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = controller.RegisterDID()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	t.Log(controller.DID())
-}
 
 func TestCreateSK(t *testing.T) {
 	sk, err := crypto.GenerateKey()

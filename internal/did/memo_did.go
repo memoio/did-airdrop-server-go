@@ -21,7 +21,7 @@ type MemoDID struct {
 }
 
 func NewMemoDID(chain string, logger *log.Helper) (*MemoDID, error) {
-	controller, err := contract.NewController(chain)
+	controller, err := contract.NewController(chain, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func NewMemoDID(chain string, logger *log.Helper) (*MemoDID, error) {
 
 // Create unregistered DID
 func (m *MemoDID) CreateDID(chain, publicKeyStr string) (*types.MemoDID, error) {
-	_, endpoint := com.GetInsEndPointByChain(chain)
+	_, endpoint := com.GetInsEndPointByChain(m.chain)
 
 	client, err := ethclient.DialContext(context.TODO(), endpoint)
 	if err != nil {
@@ -64,4 +64,17 @@ func (m *MemoDID) CreateDID(chain, publicKeyStr string) (*types.MemoDID, error) 
 		Identifier:  identifier,
 		Identifiers: []string{identifier},
 	}, nil
+}
+
+func (m *MemoDID) RegisterDID(did, vtype string, publicKey, sig []byte) (string, error) {
+	err := m.Controller.RegisterDID(did, m.getMethodType(vtype), publicKey, sig)
+	if err != nil {
+		m.logger.Error(err)
+		return "", err
+	}
+	return did, nil
+}
+
+func (m *MemoDID) GetDIDStatus() {
+
 }
