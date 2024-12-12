@@ -61,6 +61,12 @@ paths:
         required: true
         schema:
           type: string
+      - description: user address
+        in: body
+        name: address
+        required: true
+        schema:
+          type: string
       produces:
       - application/json
       responses:
@@ -91,7 +97,7 @@ paths:
         type: string
       - description: publicKey
         in: query
-        name: publicKey
+        name: address
         required: true
         type: string
       produces:
@@ -166,7 +172,7 @@ paths:
       parameters:
       - description: user did
         in: query
-        name: did
+        name: address
         required: true
         type: string
       produces:

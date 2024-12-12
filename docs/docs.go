@@ -37,6 +37,15 @@ const docTemplate = `{
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    {
+                        "description": "user address",
+                        "name": "address",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -84,7 +93,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "publicKey",
-                        "name": "publicKey",
+                        "name": "address",
                         "in": "query",
                         "required": true
                     }
@@ -200,7 +209,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "user did",
-                        "name": "did",
+                        "name": "address",
                         "in": "query",
                         "required": true
                     }

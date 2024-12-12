@@ -297,3 +297,15 @@ func unpackError(result []byte) (string, error) {
 	}
 	return vs[0].(string), nil
 }
+
+func TestGetNonce(t *testing.T) {
+	// logger := klog.With(klog.NewStdLogger(os.Stdout),
+	// 	"ts", klog.DefaultTimestamp,
+	// 	"caller", klog.DefaultCaller,
+	// )
+	// controller, err := NewController("dev", klog.NewHelper(logger))
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+
+}

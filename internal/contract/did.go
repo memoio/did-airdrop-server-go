@@ -15,6 +15,8 @@ import (
 	"github.com/memoio/go-did/types"
 )
 
+var DefaultContext = "https://www.w3.org/ns/did/v1"
+
 var (
 	checkTxSleepTime = 6 // 先等待6s（出块时间加1）
 	nextBlockTime    = 5 // 出块时间5s
@@ -35,6 +37,29 @@ func (c *Controller) RegisterDID(did, method string, publickey, sig []byte) erro
 	}
 
 	tx, err := proxyIns.CreateDID(c.didTransactor, did, method, publickey, sig)
+	if err != nil {
+		c.logger.Error(err)
+		return err
+	}
+
+	return c.CheckTx(tx.Hash(), "RegisterDID")
+}
+
+func (c *Controller) RegisterDIDByAddress(did, method string, address, sig []byte) error {
+	client, err := ethclient.DialContext(context.TODO(), c.endpoint)
+	if err != nil {
+		c.logger.Error(err)
+		return err
+	}
+	defer client.Close()
+
+	proxyIns, err := proxy.NewProxy(c.proxyAddr, client)
+	if err != nil {
+		c.logger.Error(err)
+		return err
+	}
+
+	tx, err := proxyIns.CreateDID(c.didTransactor, did, method, address, sig)
 	if err != nil {
 		c.logger.Error(err)
 		return err
@@ -93,7 +118,13 @@ func (c *Controller) GetDIDStatus(didStr string) (bool, error) {
 	return dactivated, nil
 }
 
-func (c *Controller) GetNonce(did string) (uint64, error) {
+func (c *Controller) GetNonce(didStr string) (uint64, error) {
+	did, err := types.ParseMemoDID(didStr)
+	if err != nil {
+		c.logger.Error(err)
+		return 0, err
+	}
+
 	client, err := ethclient.DialContext(context.TODO(), c.endpoint)
 	if err != nil {
 		c.logger.Error(err)
@@ -106,13 +137,44 @@ func (c *Controller) GetNonce(did string) (uint64, error) {
 		return 0, err
 	}
 
-	nonce, err := proxyCaller.GetNonce(&bind.CallOpts{}, did)
+	nonce, err := proxyCaller.GetNonce(&bind.CallOpts{}, did.Identifier)
 	if err != nil {
 		c.logger.Error(err)
 		return 0, err
 	}
 
 	return nonce, nil
+}
+
+func (c *Controller) GetDIDInfo(didString string) (*types.MemoDIDDocument, error) {
+	did, err := types.ParseMemoDID(didString)
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := ethclient.DialContext(context.TODO(), c.endpoint)
+	if err != nil {
+		return nil, err
+	}
+	defer client.Close()
+
+	accountIns, err := proxy.NewIAccountDid(c.accountAddr, client)
+	if err != nil {
+		return nil, err
+	}
+
+	dactivated, err := accountIns.IsDeactivated(&bind.CallOpts{}, did.Identifier)
+	if err != nil {
+		return nil, err
+	}
+	if dactivated {
+		return &types.MemoDIDDocument{}, nil
+	}
+
+	return &types.MemoDIDDocument{
+		Context: DefaultContext,
+		ID:      *did,
+	}, nil
 }
 
 func (c *Controller) CheckTx(txHash common.Hash, name string) error {
@@ -141,6 +203,7 @@ func (c *Controller) CheckTx(txHash common.Hash, name string) error {
 			c.logger.Error(err)
 			return err
 		}
+
 		err := xerrors.Errorf("%s: transaction(%s) mined but execution failed, please check your tx input", name, txHash)
 		c.logger.Error(err)
 		return err

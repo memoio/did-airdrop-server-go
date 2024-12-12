@@ -83,3 +83,19 @@ func NewControllerWithDID(chain string, logger *log.Helper) (*Controller, error)
 	}, nil
 
 }
+
+func (c *Controller) Proxy() common.Address {
+	return c.proxyAddr
+}
+
+func (c *Controller) Account() common.Address {
+	return c.accountAddr
+}
+
+func (c *Controller) EndPoint() string {
+	return c.endpoint
+}
+
+func (c *Controller) Instance() common.Address {
+	return c.instanceAddr
+}
