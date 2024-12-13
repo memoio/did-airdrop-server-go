@@ -26,11 +26,12 @@ import (
 )
 
 var (
-	privatekey = "9b4fc2a14cbc63a0d338377413ca72949cbb2fd5be1b08844b4b5e332597d91e"
-	address    = "0x47D4f617A654337AFB121F455629fF7d92b670eA"
-	publickey  = "0x03ecc373891778bed36426ddcd682bf1e0b5a99a8d8534be05a000ddc4faaccea0"
-
+	privatekey    = "9b4fc2a14cbc63a0d338377413ca72949cbb2fd5be1b08844b4b5e332597d91e"
+	address       = "0x47D4f617A654337AFB121F455629fF7d92b670eA"
+	publickey     = "0x03ecc373891778bed36426ddcd682bf1e0b5a99a8d8534be05a000ddc4faaccea0"
+	sk1           = "cf9f8e55aaf30ab82d6daec06248cdfb1a761db68bc5ac30b230c4beaa48e3e4"
 	walletPrivate = "7a71499718e02f0bef77a9a34cd8eca62a3c3964caf5c599c16855e6774953a1"
+	message       = "0x2e91efb096c737d898be749479e99f5b4ce386127ee616dfb206a218c77304e5"
 )
 
 var (
@@ -64,21 +65,25 @@ func TestGetPublicKey(t *testing.T) {
 }
 
 func TestSignatureMsg(t *testing.T) {
-	privateKey, err := crypto.HexToECDSA(privatekey)
+	privateKey, err := crypto.HexToECDSA(sk1)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	msg := hexutil.MustDecode("0x582594f99c594ff1b6a6c0af31bdce9c9a62637d4d461eb0c246b84ce7bb1b03")
+	msg := hexutil.MustDecode("0x1322499d95e9b59914a793bef45d8d9e979c5302a74e351dbe6f57a62f4cf243")
 	sig, err := crypto.Sign(msg, privateKey)
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	if sig[64] == 27 || sig[64] == 28 {
+		sig[64] -= 27
+	}
+
 	t.Log(hexutil.Encode(sig))
 }
 func TestGetAddress(t *testing.T) {
-	privateKey, err := crypto.HexToECDSA(privatekey)
+	privateKey, err := crypto.HexToECDSA(sk1)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -22,6 +22,29 @@ var (
 	nextBlockTime    = 5 // 出块时间5s
 )
 
+func (c *Controller) RegisterDIDByAdmin(did, method string, address []byte) error {
+	client, err := ethclient.DialContext(context.TODO(), c.endpoint)
+	if err != nil {
+		c.logger.Error(err)
+		return err
+	}
+	defer client.Close()
+
+	proxyIns, err := proxy.NewProxy(c.proxyAddr, client)
+	if err != nil {
+		c.logger.Error(err)
+		return err
+	}
+
+	tx, err := proxyIns.CreateDIDByAdmin(c.didTransactor, did, method, address)
+	if err != nil {
+		c.logger.Error(err)
+		return err
+	}
+
+	return c.CheckTx(tx.Hash(), "RegisterDID")
+}
+
 func (c *Controller) RegisterDID(did, method string, publickey, sig []byte) error {
 	client, err := ethclient.DialContext(context.TODO(), c.endpoint)
 	if err != nil {
@@ -118,13 +141,7 @@ func (c *Controller) GetDIDStatus(didStr string) (bool, error) {
 	return dactivated, nil
 }
 
-func (c *Controller) GetNonce(didStr string) (uint64, error) {
-	did, err := types.ParseMemoDID(didStr)
-	if err != nil {
-		c.logger.Error(err)
-		return 0, err
-	}
-
+func (c *Controller) GetNonce(didI string) (uint64, error) {
 	client, err := ethclient.DialContext(context.TODO(), c.endpoint)
 	if err != nil {
 		c.logger.Error(err)
@@ -137,7 +154,7 @@ func (c *Controller) GetNonce(didStr string) (uint64, error) {
 		return 0, err
 	}
 
-	nonce, err := proxyCaller.GetNonce(&bind.CallOpts{}, did.Identifier)
+	nonce, err := proxyCaller.GetNonce(&bind.CallOpts{}, didI)
 	if err != nil {
 		c.logger.Error(err)
 		return 0, err
@@ -146,35 +163,43 @@ func (c *Controller) GetNonce(didStr string) (uint64, error) {
 	return nonce, nil
 }
 
-func (c *Controller) GetDIDInfo(didString string) (*types.MemoDIDDocument, error) {
-	did, err := types.ParseMemoDID(didString)
-	if err != nil {
-		return nil, err
-	}
-
+func (c *Controller) GetDIDInfo(didI string) (string, error) {
 	client, err := ethclient.DialContext(context.TODO(), c.endpoint)
 	if err != nil {
-		return nil, err
+		c.logger.Error(err)
+		return "", err
 	}
 	defer client.Close()
 
 	accountIns, err := proxy.NewIAccountDid(c.accountAddr, client)
 	if err != nil {
-		return nil, err
+		c.logger.Error(err)
+		return "", err
 	}
 
-	dactivated, err := accountIns.IsDeactivated(&bind.CallOpts{}, did.Identifier)
+	dactivated, err := accountIns.IsDeactivated(&bind.CallOpts{}, didI)
 	if err != nil {
-		return nil, err
+		c.logger.Error(err)
+		return "", err
 	}
 	if dactivated {
-		return &types.MemoDIDDocument{}, nil
+		c.logger.Error(err)
+		return "", err
 	}
 
-	return &types.MemoDIDDocument{
-		Context: DefaultContext,
-		ID:      *did,
-	}, nil
+	proxyCaller, err := proxy.NewProxyCaller(c.proxyAddr, client)
+	if err != nil {
+		c.logger.Error(err)
+		return "", err
+	}
+
+	number, err := proxyCaller.Number(&bind.CallOpts{}, didI)
+	if err != nil {
+		c.logger.Error(err)
+		return "", err
+	}
+
+	return number.String(), nil
 }
 
 func (c *Controller) CheckTx(txHash common.Hash, name string) error {

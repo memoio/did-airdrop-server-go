@@ -36,6 +36,7 @@ func NewControllerWithDID(chain string, logger *log.Helper) (*Controller, error)
 
 	client, err := ethclient.DialContext(context.TODO(), endpoint)
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 
@@ -46,31 +47,35 @@ func NewControllerWithDID(chain string, logger *log.Helper) (*Controller, error)
 
 	privateKey, err := crypto.HexToECDSA(config.Privatekey)
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 
 	instanceIns, err := inst.NewInstance(instanceAddr, client)
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 
 	// get proxyAddr
 	proxyAddr, err := instanceIns.Instances(&bind.CallOpts{}, com.TypeDidProxy)
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 
 	accountAddr, err := instanceIns.Instances(&bind.CallOpts{}, com.TypeAccountDid)
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 
 	auth, err := bind.NewKeyedTransactorWithChainID(privateKey, chainID)
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
-	auth.Value = big.NewInt(0)     // in wei
-	auth.GasLimit = uint64(300000) // in units
+	auth.Value = big.NewInt(0) // in wei
 
 	return &Controller{
 		instanceAddr:  instanceAddr,

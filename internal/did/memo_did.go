@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/binary"
 	"encoding/hex"
+	"strings"
 
 	"github.com/did-server/internal/contract"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/go-kratos/kratos/v2/log"
@@ -67,7 +69,7 @@ func (m *MemoDID) CreateDIDByPubKey(publicKeyStr string) (*types.MemoDID, error)
 	}, nil
 }
 
-func (m *MemoDID) CreateDIDByAaddress(addressStr string) (*types.MemoDID, error) {
+func (m *MemoDID) CreateDIDByAddress(addressStr string) (*types.MemoDID, error) {
 	_, endpoint := com.GetInsEndPointByChain(m.chain)
 
 	client, err := ethclient.DialContext(context.TODO(), endpoint)
@@ -93,15 +95,39 @@ func (m *MemoDID) CreateDIDByAaddress(addressStr string) (*types.MemoDID, error)
 	}, nil
 }
 
-func (m *MemoDID) RegisterDIDByAddress(addressStr string, sig []byte) (string, error) {
-	did, err := m.CreateDIDByAaddress(addressStr)
+func (m *MemoDID) RegisterDIDByAddress(addressStr string) (string, error) {
+	did, err := m.CreateDIDByAddress(addressStr)
 	if err != nil {
 		m.logger.Error(err)
 		return "", err
 	}
 
 	address := common.HexToAddress(addressStr)
-	err = m.Controller.RegisterDIDByAddress(did.Identifier, m.getMethodType("address"), address.Bytes(), sig)
+	err = m.Controller.RegisterDIDByAdmin(did.Identifier, m.getMethodType("address"), address.Bytes())
+	if err != nil {
+		if strings.Contains(err.Error(), "existed") {
+			return did.String(), nil
+		}
+		m.logger.Error(err)
+		return "", err
+	}
+	return did.String(), nil
+}
+
+func (m *MemoDID) RegisterDIDByPublic(publicKeyStr string, sig []byte) (string, error) {
+	did, err := m.CreateDIDByPubKey(publicKeyStr)
+	if err != nil {
+		m.logger.Error(err)
+		return "", err
+	}
+
+	publicKeyByte, err := hexutil.Decode(publicKeyStr)
+	if err != nil {
+		m.logger.Error(err)
+		return "", err
+	}
+
+	err = m.Controller.RegisterDID(did.Identifier, m.getMethodType("pubkey"), publicKeyByte, sig)
 	if err != nil {
 		m.logger.Error(err)
 		return "", err
@@ -109,25 +135,22 @@ func (m *MemoDID) RegisterDIDByAddress(addressStr string, sig []byte) (string, e
 	return did.String(), nil
 }
 
-func (m *MemoDID) RegisterDID(did, vtype string, publicKey, sig []byte) (string, error) {
-	err := m.Controller.RegisterDID(did, m.getMethodType(vtype), publicKey, sig)
-	if err != nil {
-		m.logger.Error(err)
-		return "", err
-	}
-	return did, nil
-}
-
 func (m *MemoDID) GetDIDStatus() {
 
 }
 
-func (m *MemoDID) GetDIDInfo(address string) (*types.MemoDIDDocument, error) {
-	did, err := m.CreateDIDByAaddress(address)
+func (m *MemoDID) GetDIDInfo(address string) (string, string, error) {
+	did, err := m.CreateDIDByAddress(address)
 	if err != nil {
 		m.logger.Error(err)
-		return nil, err
+		return "", "", err
 	}
 
-	return m.Controller.GetDIDInfo(did.String())
+	number, err := m.Controller.GetDIDInfo(did.String())
+	if err != nil {
+		m.logger.Error(err)
+		return "", "", err
+	}
+
+	return did.String(), number, nil
 }

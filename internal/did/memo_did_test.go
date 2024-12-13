@@ -11,9 +11,10 @@ import (
 
 const (
 	privatekey = "9b4fc2a14cbc63a0d338377413ca72949cbb2fd5be1b08844b4b5e332597d91e"
+	sk1        = "cf9f8e55aaf30ab82d6daec06248cdfb1a761db68bc5ac30b230c4beaa48e3e4"
 	publickey  = "0x03ecc373891778bed36426ddcd682bf1e0b5a99a8d8534be05a000ddc4faaccea0"
-	did        = "did:memo:3e237e60f5d68a5f1a73bc108dd9150a5cdf439754463acc2aa0962876ba4ce7"
 	address    = "0x47D4f617A654337AFB121F455629fF7d92b670eA"
+	address1   = "0x594CE7BA907710f5647C6ec58db168B0a2686de4"
 )
 
 func TestCreateDID(t *testing.T) {
@@ -27,7 +28,7 @@ func TestCreateDID(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	did, err := memoDID.CreateDIDByAaddress(address)
+	did, err := memoDID.CreateDIDByAddress(address)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,9 +47,14 @@ func TestGetNonce(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	did, err := memoDID.CreateDIDByAddress(address1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	t.Logf("endpoint: %s, ins: %s, proxy: %s, account: %s", memoDID.Controller.EndPoint(), memoDID.Controller.Instance().String(), memoDID.Controller.Proxy().String(), memoDID.Controller.Account().String())
 
-	nonce, err := memoDID.Controller.GetNonce(did)
+	nonce, err := memoDID.Controller.GetNonce(did.String())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -67,12 +73,17 @@ func TestRegisterDID(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	pubKeyBytes, err := hexutil.Decode(publickey)
+	did, err := memoDID.CreateDIDByAddress(address1)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	unsig, err := memoDID.getCreateDIDHashPubkey(did, publickey, 0)
+	nonce, err := memoDID.Controller.GetNonce(did.String())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	unsig, err := memoDID.getCreateDIDHashPubkey(did.String(), publickey, nonce)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -93,12 +104,97 @@ func TestRegisterDID(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	did, err := memoDID.RegisterDID(did, "memo", pubKeyBytes, sig)
+	didStr, err := memoDID.RegisterDIDByPublic(publickey, sig)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	t.Log(did)
+	t.Log(didStr)
+}
+
+func TestGetHashByAddress(t *testing.T) {
+	addr := address1
+
+	logger := klog.With(klog.NewStdLogger(os.Stdout),
+		"ts", klog.DefaultTimestamp,
+		"caller", klog.DefaultCaller,
+	)
+
+	memoDID, err := NewMemoDID("dev", klog.NewHelper(logger))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	did, err := memoDID.CreateDIDByAddress(addr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log("did:", did.String())
+
+	nonce, err := memoDID.Controller.GetNonce(did.Identifier)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	unsig, err := memoDID.getCreateDIDHashByAddress(did.Identifier, addr, nonce)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(unsig)
+
+}
+
+func TestRegisterDIDByAddress(t *testing.T) {
+	addr := address1
+
+	logger := klog.With(klog.NewStdLogger(os.Stdout),
+		"ts", klog.DefaultTimestamp,
+		"caller", klog.DefaultCaller,
+	)
+
+	memoDID, err := NewMemoDID("dev", klog.NewHelper(logger))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	did, err := memoDID.CreateDIDByAddress(addr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log("did:", did.String())
+
+	// nonce, err := memoDID.Controller.GetNonce(did.Identifier)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+
+	// unsig, err := memoDID.getCreateDIDHashByAddress(did.Identifier, addr, nonce)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+
+	// unSigByte, err := hexutil.Decode(unsig)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+
+	// privateKey, err := crypto.HexToECDSA(sk1)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+
+	// _, err := crypto.Sign(unSigByte, privateKey)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+
+	didStr, err := memoDID.RegisterDIDByAddress(addr)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(didStr)
 }
 
 func TestGetDIDInfo(t *testing.T) {
@@ -112,10 +208,10 @@ func TestGetDIDInfo(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	did, err := memoDID.GetDIDInfo(address)
+	did, number, err := memoDID.GetDIDInfo(address)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	t.Log(did)
+	t.Log(did, number)
 }

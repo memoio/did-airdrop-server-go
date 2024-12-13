@@ -1,5 +1,5 @@
 package config
 
 var (
-	Privatekey = "7a71499718e02f0bef77a9a34cd8eca62a3c3964caf5c599c16855e6774953a1"
+	Privatekey = "6ec7e0cdda802a466401c912b0dac5ff6116e4372746a455bb43c61294e6f01f"
 )

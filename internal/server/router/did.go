@@ -3,7 +3,6 @@ package router
 import (
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/gin-gonic/gin"
 )
 
@@ -36,6 +35,8 @@ func (h *handle) getCreateSigMsg(c *gin.Context) {
 		c.JSON(ErrDIDGetSignatureMessage.Code, ErrDIDGetSignatureMessage)
 		return
 	}
+
+	h.logger.Info(msg)
 	c.JSON(200, GetSigMsgResponse{Msg: msg})
 }
 
@@ -53,7 +54,7 @@ func (h *handle) getCreateSigMsg(c *gin.Context) {
 func (h *handle) createDID(c *gin.Context) {
 	body := make(map[string]interface{})
 	c.BindJSON(&body)
-	sig, ok := body["sig"].(string)
+	_, ok := body["sig"].(string)
 	if !ok {
 		h.logger.Error("sig is not string", body)
 		c.JSON(ErrSignatureNull.Code, ErrSignatureNull)
@@ -67,14 +68,14 @@ func (h *handle) createDID(c *gin.Context) {
 		return
 	}
 
-	SigByte, err := hexutil.Decode(sig)
-	if err != nil {
-		h.logger.Error(err)
-		c.JSON(ErrSignature.Code, ErrSignature)
-		return
-	}
+	// SigByte, err := hexutil.Decode(sig)
+	// if err != nil {
+	// 	h.logger.Error(err)
+	// 	c.JSON(ErrSignature.Code, ErrSignature)
+	// 	return
+	// }
 
-	did, err := h.did.RegisterDIDByAddress(address, SigByte)
+	did, err := h.did.RegisterDIDByAddress(address)
 	if err != nil {
 		h.logger.Error(err)
 		c.JSON(ErrDIDCreateFailed.Code, ErrDIDCreateFailed)
@@ -96,13 +97,16 @@ func (h *handle) createDID(c *gin.Context) {
 func (h *handle) getDIDInfo(c *gin.Context) {
 	address := c.Query("address")
 
-	didDoc, err := h.did.GetDIDInfo(address)
+	did, number, err := h.did.GetDIDInfo(address)
 	if err != nil {
 		h.logger.Error(err)
 		c.JSON(ErrDIDGetInfo.Code, gin.H{"message": ErrDIDGetInfo.Message, "error": err.Error()})
 	}
 
-	c.JSON(200, didDoc)
+	c.JSON(200, gin.H{
+		"did":    did,
+		"number": number,
+	})
 }
 
 // @ Summary GetDeleteSigMsg
