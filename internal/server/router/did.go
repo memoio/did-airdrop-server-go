@@ -14,6 +14,7 @@ func loadDIDmoudles(r *gin.RouterGroup, h *handle) {
 	r.POST("/delete", h.deleteDID)
 	r.POST("/addverifyinfo", h.addVerifyInfo)
 	r.POST("/changeverifyinfo", h.changeVerifyInfo)
+	r.GET("/exist", h.getDIDExist)
 
 }
 
@@ -96,6 +97,11 @@ func (h *handle) createDID(c *gin.Context) {
 // @Failure 503 {object} Error
 func (h *handle) getDIDInfo(c *gin.Context) {
 	address := c.Query("address")
+	if address == "" {
+		h.logger.Error("address is null", address)
+		c.JSON(ErrAddressNull.Code, ErrAddressNull)
+		return
+	}
 
 	did, number, err := h.did.GetDIDInfo(address)
 	if err != nil {
@@ -132,6 +138,26 @@ func (h *handle) getDeleteSigMsg(c *gin.Context) {
 	}
 
 	c.JSON(200, GetSigMsgResponse{Msg: msg})
+}
+
+func (h *handle) getDIDExist(c *gin.Context) {
+	address := c.Query("address")
+	if address == "" {
+		h.logger.Error("address is null", address)
+		c.JSON(ErrAddressNull.Code, ErrAddressNull)
+		return
+	}
+
+	number, err := h.did.GetDIDExist(address)
+	if err != nil {
+		h.logger.Error(err)
+		c.JSON(ErrDIDGetInfo.Code, gin.H{"message": ErrDIDGetInfo.Message, "error": err.Error()})
+	}
+
+	c.JSON(200, gin.H{
+		"exist": number,
+	})
+
 }
 
 // @ Summary DeleteDID

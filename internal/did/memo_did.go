@@ -146,11 +146,27 @@ func (m *MemoDID) GetDIDInfo(address string) (string, string, error) {
 		return "", "", err
 	}
 
-	number, err := m.Controller.GetDIDInfo(did.String())
+	number, err := m.Controller.GetDIDInfo(did.Identifier)
 	if err != nil {
 		m.logger.Error(err)
 		return "", "", err
 	}
 
 	return did.String(), number, nil
+}
+
+func (m *MemoDID) GetDIDExist(address string) (int, error) {
+	did, err := m.CreateDIDByAddress(address)
+	if err != nil {
+		m.logger.Error(err)
+		return 0, err
+	}
+
+	number, err := m.Controller.GetDIDVerify(did.Identifier)
+	if err != nil {
+		m.logger.Error(err)
+		return 0, err
+	}
+
+	return number, nil
 }

@@ -46,7 +46,7 @@ func TestCreateSK(t *testing.T) {
 	}
 
 	privateKeyBytes := crypto.FromECDSA(sk)
-	t.Log(hexutil.Encode(privateKeyBytes))
+	t.Log(hexutil.Encode(privateKeyBytes)[2:])
 }
 
 func TestGetPublicKey(t *testing.T) {
@@ -83,7 +83,7 @@ func TestSignatureMsg(t *testing.T) {
 	t.Log(hexutil.Encode(sig))
 }
 func TestGetAddress(t *testing.T) {
-	privateKey, err := crypto.HexToECDSA(sk1)
+	privateKey, err := crypto.HexToECDSA("1955101a7daf20e2de1e12d4ed63537bf6256193193f76bd2a3069c63aa4df5e")
 	if err != nil {
 		t.Fatal(err)
 	}

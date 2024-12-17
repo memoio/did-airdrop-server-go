@@ -202,6 +202,32 @@ func (c *Controller) GetDIDInfo(didI string) (string, error) {
 	return number.String(), nil
 }
 
+func (c *Controller) GetDIDVerify(didI string) (int, error) {
+	client, err := ethclient.DialContext(context.TODO(), c.endpoint)
+	if err != nil {
+		c.logger.Error(err)
+		return 0, err
+	}
+
+	accountIns, err := proxy.NewIAccountDid(c.accountAddr, client)
+	if err != nil {
+		c.logger.Error(err)
+		return 0, err
+	}
+
+	vlens, err := accountIns.GetVeriLen(&bind.CallOpts{}, didI)
+	if err != nil {
+		c.logger.Error(err)
+		return 0, err
+	}
+
+	if vlens.Uint64() > 0 {
+		return 1, nil
+	}
+
+	return 0, nil
+}
+
 func (c *Controller) CheckTx(txHash common.Hash, name string) error {
 	var receipt *etypes.Receipt
 

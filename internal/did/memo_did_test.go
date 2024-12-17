@@ -37,6 +37,7 @@ func TestCreateDID(t *testing.T) {
 }
 
 func TestGetNonce(t *testing.T) {
+	addr := "0x6b71cF65cCdd462e9DE30872422A97987925d12a"
 	logger := klog.With(klog.NewStdLogger(os.Stdout),
 		"ts", klog.DefaultTimestamp,
 		"caller", klog.DefaultCaller,
@@ -47,14 +48,14 @@ func TestGetNonce(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	did, err := memoDID.CreateDIDByAddress(address1)
+	did, err := memoDID.CreateDIDByAddress(addr)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	t.Logf("endpoint: %s, ins: %s, proxy: %s, account: %s", memoDID.Controller.EndPoint(), memoDID.Controller.Instance().String(), memoDID.Controller.Proxy().String(), memoDID.Controller.Account().String())
 
-	nonce, err := memoDID.Controller.GetNonce(did.String())
+	nonce, err := memoDID.Controller.GetNonce(did.Identifier)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -113,7 +114,7 @@ func TestRegisterDID(t *testing.T) {
 }
 
 func TestGetHashByAddress(t *testing.T) {
-	addr := address1
+	addr := "0x2EB682d7387d65a785EbF983987E5977dc6700D4"
 
 	logger := klog.With(klog.NewStdLogger(os.Stdout),
 		"ts", klog.DefaultTimestamp,
@@ -146,7 +147,7 @@ func TestGetHashByAddress(t *testing.T) {
 }
 
 func TestRegisterDIDByAddress(t *testing.T) {
-	addr := address1
+	addr := "0x2EB682d7387d65a785EbF983987E5977dc6700D4"
 
 	logger := klog.With(klog.NewStdLogger(os.Stdout),
 		"ts", klog.DefaultTimestamp,
@@ -198,6 +199,7 @@ func TestRegisterDIDByAddress(t *testing.T) {
 }
 
 func TestGetDIDInfo(t *testing.T) {
+	addr := "0x2EB682d7387d65a785EbF983987E5977dc6700D4"
 	logger := klog.With(klog.NewStdLogger(os.Stdout),
 		"ts", klog.DefaultTimestamp,
 		"caller", klog.DefaultCaller,
@@ -208,10 +210,30 @@ func TestGetDIDInfo(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	did, number, err := memoDID.GetDIDInfo(address)
+	did, number, err := memoDID.GetDIDInfo(addr)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	t.Log(did, number)
+}
+
+func TestGetDIDExist(t *testing.T) {
+	addr := "0x6b71cF65cCdd462e9DE30872422A97987925d12a"
+	logger := klog.With(klog.NewStdLogger(os.Stdout),
+		"ts", klog.DefaultTimestamp,
+		"caller", klog.DefaultCaller,
+	)
+
+	memoDID, err := NewMemoDID("dev", klog.NewHelper(logger))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	did, err := memoDID.GetDIDExist(addr)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(did)
 }
