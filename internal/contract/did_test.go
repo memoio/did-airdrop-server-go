@@ -83,7 +83,7 @@ func TestSignatureMsg(t *testing.T) {
 	t.Log(hexutil.Encode(sig))
 }
 func TestGetAddress(t *testing.T) {
-	privateKey, err := crypto.HexToECDSA("1955101a7daf20e2de1e12d4ed63537bf6256193193f76bd2a3069c63aa4df5e")
+	privateKey, err := crypto.HexToECDSA("8c69ce46d3639d77fce3f43ae9fd90423925b82b97862df0369bc8d714482ef1")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -2,6 +2,7 @@ package contract
 
 import (
 	"context"
+	"math/big"
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -22,7 +23,7 @@ var (
 	nextBlockTime    = 5 // 出块时间5s
 )
 
-func (c *Controller) RegisterDIDByAdmin(did, method string, address []byte) error {
+func (c *Controller) RegisterDIDByAdmin(did, method string, address []byte, number *big.Int) error {
 	client, err := ethclient.DialContext(context.TODO(), c.endpoint)
 	if err != nil {
 		c.logger.Error(err)
@@ -36,7 +37,7 @@ func (c *Controller) RegisterDIDByAdmin(did, method string, address []byte) erro
 		return err
 	}
 
-	tx, err := proxyIns.CreateDIDByAdmin(c.didTransactor, did, method, address)
+	tx, err := proxyIns.CreateDIDByAdmin(c.didTransactor, did, method, address, number)
 	if err != nil {
 		c.logger.Error(err)
 		return err
@@ -45,7 +46,7 @@ func (c *Controller) RegisterDIDByAdmin(did, method string, address []byte) erro
 	return c.CheckTx(tx.Hash(), "RegisterDID")
 }
 
-func (c *Controller) RegisterDID(did, method string, publickey, sig []byte) error {
+func (c *Controller) RegisterDID(did, method string, publickey, sig []byte, number *big.Int) error {
 	client, err := ethclient.DialContext(context.TODO(), c.endpoint)
 	if err != nil {
 		c.logger.Error(err)
@@ -59,7 +60,7 @@ func (c *Controller) RegisterDID(did, method string, publickey, sig []byte) erro
 		return err
 	}
 
-	tx, err := proxyIns.CreateDID(c.didTransactor, did, method, publickey, sig)
+	tx, err := proxyIns.CreateDID(c.didTransactor, did, method, publickey, sig, number)
 	if err != nil {
 		c.logger.Error(err)
 		return err
@@ -68,7 +69,7 @@ func (c *Controller) RegisterDID(did, method string, publickey, sig []byte) erro
 	return c.CheckTx(tx.Hash(), "RegisterDID")
 }
 
-func (c *Controller) RegisterDIDByAddress(did, method string, address, sig []byte) error {
+func (c *Controller) RegisterDIDByAddress(did, method string, address, sig []byte, number *big.Int) error {
 	client, err := ethclient.DialContext(context.TODO(), c.endpoint)
 	if err != nil {
 		c.logger.Error(err)
@@ -82,7 +83,7 @@ func (c *Controller) RegisterDIDByAddress(did, method string, address, sig []byt
 		return err
 	}
 
-	tx, err := proxyIns.CreateDID(c.didTransactor, did, method, address, sig)
+	tx, err := proxyIns.CreateDID(c.didTransactor, did, method, address, sig, number)
 	if err != nil {
 		c.logger.Error(err)
 		return err

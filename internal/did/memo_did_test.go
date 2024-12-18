@@ -147,7 +147,7 @@ func TestGetHashByAddress(t *testing.T) {
 }
 
 func TestRegisterDIDByAddress(t *testing.T) {
-	addr := "0x2EB682d7387d65a785EbF983987E5977dc6700D4"
+	addr := "0x013A08061C08E3852aBb921F305B304e0C165eB2"
 
 	logger := klog.With(klog.NewStdLogger(os.Stdout),
 		"ts", klog.DefaultTimestamp,
@@ -165,31 +165,6 @@ func TestRegisterDIDByAddress(t *testing.T) {
 	}
 	t.Log("did:", did.String())
 
-	// nonce, err := memoDID.Controller.GetNonce(did.Identifier)
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-
-	// unsig, err := memoDID.getCreateDIDHashByAddress(did.Identifier, addr, nonce)
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-
-	// unSigByte, err := hexutil.Decode(unsig)
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-
-	// privateKey, err := crypto.HexToECDSA(sk1)
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-
-	// _, err := crypto.Sign(unSigByte, privateKey)
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-
 	didStr, err := memoDID.RegisterDIDByAddress(addr)
 	if err != nil {
 		t.Fatal(err)
@@ -199,7 +174,7 @@ func TestRegisterDIDByAddress(t *testing.T) {
 }
 
 func TestGetDIDInfo(t *testing.T) {
-	addr := "0x2EB682d7387d65a785EbF983987E5977dc6700D4"
+	addr := "0x013A08061C08E3852aBb921F305B304e0C165eB2"
 	logger := klog.With(klog.NewStdLogger(os.Stdout),
 		"ts", klog.DefaultTimestamp,
 		"caller", klog.DefaultCaller,
@@ -219,7 +194,7 @@ func TestGetDIDInfo(t *testing.T) {
 }
 
 func TestGetDIDExist(t *testing.T) {
-	addr := "0x6b71cF65cCdd462e9DE30872422A97987925d12a"
+	addr := "0x125B7b0Ed506fbF5A84372e590F206B74b5aE915"
 	logger := klog.With(klog.NewStdLogger(os.Stdout),
 		"ts", klog.DefaultTimestamp,
 		"caller", klog.DefaultCaller,

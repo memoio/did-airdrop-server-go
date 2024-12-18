@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/binary"
 	"encoding/hex"
+	"math/big"
 	"strings"
 
 	"github.com/did-server/internal/contract"
+	"github.com/did-server/internal/database"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -21,6 +23,7 @@ type MemoDID struct {
 	Controller *contract.Controller
 	chain      string
 	logger     *log.Helper
+	db         *database.DataBase
 }
 
 func NewMemoDID(chain string, logger *log.Helper) (*MemoDID, error) {
@@ -29,10 +32,16 @@ func NewMemoDID(chain string, logger *log.Helper) (*MemoDID, error) {
 		return nil, err
 	}
 
+	db, err := database.CreateDB(logger)
+	if err != nil {
+		return nil, err
+	}
+
 	return &MemoDID{
 		Controller: controller,
 		chain:      chain,
 		logger:     logger,
+		db:         db,
 	}, nil
 }
 
@@ -103,7 +112,16 @@ func (m *MemoDID) RegisterDIDByAddress(addressStr string) (string, error) {
 	}
 
 	address := common.HexToAddress(addressStr)
-	err = m.Controller.RegisterDIDByAdmin(did.Identifier, m.getMethodType("address"), address.Bytes())
+
+	num, err := m.db.GetNumber()
+	if err != nil {
+		m.logger.Error(err)
+		return "", err
+	}
+
+	m.logger.Info("register did: ", did.String(), " number: ", num)
+
+	err = m.Controller.RegisterDIDByAdmin(did.Identifier, m.getMethodType("address"), address.Bytes(), big.NewInt(int64(num)))
 	if err != nil {
 		if strings.Contains(err.Error(), "existed") {
 			return did.String(), nil
@@ -111,6 +129,13 @@ func (m *MemoDID) RegisterDIDByAddress(addressStr string) (string, error) {
 		m.logger.Error(err)
 		return "", err
 	}
+
+	err = m.db.AddNumber(did.String(), num)
+	if err != nil {
+		m.logger.Error(err)
+		return "", err
+	}
+
 	return did.String(), nil
 }
 
@@ -127,7 +152,13 @@ func (m *MemoDID) RegisterDIDByPublic(publicKeyStr string, sig []byte) (string, 
 		return "", err
 	}
 
-	err = m.Controller.RegisterDID(did.Identifier, m.getMethodType("pubkey"), publicKeyByte, sig)
+	num, err := m.db.GetNumber()
+	if err != nil {
+		m.logger.Error(err)
+		return "", err
+	}
+
+	err = m.Controller.RegisterDID(did.Identifier, m.getMethodType("pubkey"), publicKeyByte, sig, big.NewInt(int64(num)))
 	if err != nil {
 		m.logger.Error(err)
 		return "", err
