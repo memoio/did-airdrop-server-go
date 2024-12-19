@@ -10,7 +10,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func NewServer(port string) *http.Server {
+func NewServer(chain, port string) *http.Server {
 	gin.SetMode(gin.ReleaseMode)
 
 	r := gin.Default()
@@ -21,7 +21,7 @@ func NewServer(port string) *http.Server {
 		})
 	})
 
-	router.NewRouter(r)
+	router.NewRouter(chain, r)
 
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

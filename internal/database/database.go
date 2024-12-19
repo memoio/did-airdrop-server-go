@@ -13,7 +13,7 @@ type DataBase struct {
 
 type Number struct {
 	gorm.Model
-	Did string
+	Did string `gorm:"unique"`
 	Num int
 }
 

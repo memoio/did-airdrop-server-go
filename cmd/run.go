@@ -13,14 +13,15 @@ import (
 )
 
 var (
-	port string
+	port  string
+	chain string
 )
 
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run the application",
 	Run: func(cmd *cobra.Command, args []string) {
-		srv := server.NewServer(port)
+		srv := server.NewServer(chain, port)
 
 		go func() {
 			if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -53,6 +54,6 @@ var ServerCmd = &cobra.Command{
 
 func init() {
 	runCmd.Flags().StringVarP(&port, "port", "p", "8080", "listen port")
-
+	runCmd.Flags().StringVarP(&chain, "chain", "c", "dev", "listen port")
 	ServerCmd.AddCommand(runCmd, stopCmd)
 }

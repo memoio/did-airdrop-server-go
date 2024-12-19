@@ -104,6 +104,26 @@ func (m *MemoDID) CreateDIDByAddress(addressStr string) (*types.MemoDID, error) 
 	}, nil
 }
 
+func (m *MemoDID) GetDIDNumber() (int, error) {
+	num, err := m.db.GetNumber()
+	if err != nil {
+		m.logger.Error(err)
+		return 0, err
+	}
+
+	return num, nil
+}
+
+func (m *MemoDID) AddDIDNumber(address string, num int) error {
+	did, err := m.CreateDIDByAddress(address)
+	if err != nil {
+		m.logger.Error(err)
+		return err
+	}
+
+	return m.db.AddNumber(did.String(), num)
+}
+
 func (m *MemoDID) RegisterDIDByAddress(addressStr string) (string, error) {
 	did, err := m.CreateDIDByAddress(addressStr)
 	if err != nil {

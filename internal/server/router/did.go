@@ -15,6 +15,7 @@ func loadDIDmoudles(r *gin.RouterGroup, h *handle) {
 	r.POST("/addverifyinfo", h.addVerifyInfo)
 	r.POST("/changeverifyinfo", h.changeVerifyInfo)
 	r.GET("/exist", h.getDIDExist)
+	r.GET("/number", h.getDIDNumber)
 
 }
 
@@ -107,6 +108,7 @@ func (h *handle) getDIDInfo(c *gin.Context) {
 	if err != nil {
 		h.logger.Error(err)
 		c.JSON(ErrDIDGetInfo.Code, gin.H{"message": ErrDIDGetInfo.Message, "error": err.Error()})
+		return
 	}
 
 	c.JSON(200, gin.H{
@@ -152,6 +154,7 @@ func (h *handle) getDIDExist(c *gin.Context) {
 	if err != nil {
 		h.logger.Error(err)
 		c.JSON(ErrDIDGetInfo.Code, gin.H{"message": ErrDIDGetInfo.Message, "error": err.Error()})
+		return
 	}
 
 	c.JSON(200, gin.H{
@@ -200,4 +203,29 @@ func (h *handle) addVerifyInfo(c *gin.Context) {
 
 func (h *handle) changeVerifyInfo(c *gin.Context) {
 	c.JSON(200, ChangeVerifyInfoResponse{})
+}
+
+func (h *handle) getDIDNumber(c *gin.Context) {
+	address := c.Query("address")
+	if address == "" {
+		c.JSON(ErrAddressNull.Code, ErrAddressNull)
+		return
+	}
+	num, err := h.did.GetDIDNumber()
+	if err != nil {
+		h.logger.Error(err)
+		c.JSON(ErrDIDGetInfo.Code, gin.H{"message": ErrDIDGetInfo.Message, "error": err.Error()})
+		return
+	}
+
+	err = h.did.AddDIDNumber(address, num)
+	if err != nil {
+		h.logger.Error(err)
+		c.JSON(ErrDIDGetInfo.Code, gin.H{"message": ErrDIDGetInfo.Message, "error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"number": num,
+	})
 }

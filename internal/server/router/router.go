@@ -13,14 +13,14 @@ type handle struct {
 	did    *did.MemoDID
 }
 
-func NewRouter(r *gin.Engine) {
+func NewRouter(chain string, r *gin.Engine) {
 	logger := klog.With(klog.NewStdLogger(os.Stdout),
 		"ts", klog.DefaultTimestamp,
 		"caller", klog.DefaultCaller,
 	)
 
 	loggers := klog.NewHelper(logger)
-	did, err := did.NewMemoDID("dev", loggers)
+	did, err := did.NewMemoDID(chain, loggers)
 	if err != nil {
 		panic(err)
 	}
