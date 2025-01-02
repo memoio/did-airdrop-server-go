@@ -90,11 +90,6 @@ paths:
       - application/json
       description: GetCreateSigMsg
       parameters:
-      - description: The signature of the chain
-        in: query
-        name: chain
-        required: true
-        type: string
       - description: publicKey
         in: query
         name: address
@@ -162,6 +157,26 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/router.GetSigMsgResponse'
+      tags:
+      - DID
+  /did/exist:
+    get:
+      consumes:
+      - application/json
+      description: GetDIDExist
+      parameters:
+      - description: user address
+        in: query
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
       tags:
       - DID
   /did/info:

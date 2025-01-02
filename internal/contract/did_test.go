@@ -97,7 +97,7 @@ func TestGetAddress(t *testing.T) {
 }
 
 func TestGetBalance(t *testing.T) {
-	balance, balanceErc20, err := getBalance("dev", walletPrivate)
+	balance, balanceErc20, err := getBalance("dev", "6ec7e0cdda802a466401c912b0dac5ff6116e4372746a455bb43c61294e6f01f")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -107,9 +107,10 @@ func TestGetBalance(t *testing.T) {
 
 func TestTransfer(t *testing.T) {
 	var pledge = big.NewInt(1000000000000000000)
-	var amount = new(big.Int).Mul(pledge, big.NewInt(1000))
+	var amount = new(big.Int).Mul(pledge, big.NewInt(1))
 
-	ethAddr := common.HexToAddress(address)
+	addr := "0xa11882FbA95a590Ea03F4647Ef544aD5C6966446"
+	ethAddr := common.HexToAddress(addr)
 
 	transferMemo("dev", walletPrivate, ethAddr, amount)
 	transferEth("dev", walletPrivate, ethAddr, amount)

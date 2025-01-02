@@ -24,7 +24,6 @@ func loadDIDmoudles(r *gin.RouterGroup, h *handle) {
 // @Tags DID
 // @Accept json
 // @Produce json
-// @Param chain query string true "The signature of the chain"
 // @Param address query string true "publicKey"
 // @Success 200 {object} GetSigMsgResponse
 // @Router /did/createsigmsg [get]
@@ -142,6 +141,14 @@ func (h *handle) getDeleteSigMsg(c *gin.Context) {
 	c.JSON(200, GetSigMsgResponse{Msg: msg})
 }
 
+// @ Summary GetDIDExist
+// @Description GetDIDExist
+// @Tags DID
+// @Accept json
+// @Produce json
+// @Param address query string true "user address"
+// @Success 200 {object} string
+// @Router /did/exist [get]
 func (h *handle) getDIDExist(c *gin.Context) {
 	address := c.Query("address")
 	if address == "" {

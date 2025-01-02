@@ -24,6 +24,7 @@ var (
 )
 
 func (c *Controller) RegisterDIDByAdmin(did, method string, address []byte, number *big.Int) error {
+	c.logger.Infof("did %s method %s address %s number %d", did, method, common.Bytes2Hex(address), number.Uint64())
 	client, err := ethclient.DialContext(context.TODO(), c.endpoint)
 	if err != nil {
 		c.logger.Error(err)

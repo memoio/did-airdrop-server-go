@@ -29,11 +29,13 @@ type MemoDID struct {
 func NewMemoDID(chain string, logger *log.Helper) (*MemoDID, error) {
 	controller, err := contract.NewController(chain, logger)
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 
 	db, err := database.CreateDB(logger)
 	if err != nil {
+		logger.Error(err)
 		return nil, err
 	}
 

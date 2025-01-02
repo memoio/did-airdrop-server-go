@@ -78,13 +78,6 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "The signature of the chain",
-                        "name": "chain",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
                         "description": "publicKey",
                         "name": "address",
                         "in": "query",
@@ -181,6 +174,37 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/router.GetSigMsgResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/did/exist": {
+            "get": {
+                "description": "GetDIDExist",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "DID"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user address",
+                        "name": "address",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }

@@ -13,11 +13,9 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	com "github.com/memoio/contractsv2/common"
 	inst "github.com/memoio/contractsv2/go_contracts/instance"
-	"github.com/memoio/go-did/types"
 )
 
 type Controller struct {
-	did           *types.MemoDID
 	instanceAddr  common.Address
 	endpoint      string
 	privateKey    *ecdsa.PrivateKey
@@ -42,6 +40,7 @@ func NewControllerWithDID(chain string, logger *log.Helper) (*Controller, error)
 
 	chainID, err := client.NetworkID(context.Background())
 	if err != nil {
+		logger.Error(err)
 		chainID = big.NewInt(985)
 	}
 
@@ -76,6 +75,7 @@ func NewControllerWithDID(chain string, logger *log.Helper) (*Controller, error)
 		return nil, err
 	}
 	auth.Value = big.NewInt(0) // in wei
+	auth.GasPrice = big.NewInt(200)
 
 	return &Controller{
 		instanceAddr:  instanceAddr,

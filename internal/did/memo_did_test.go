@@ -37,7 +37,7 @@ func TestCreateDID(t *testing.T) {
 }
 
 func TestGetNonce(t *testing.T) {
-	addr := "0x6b71cF65cCdd462e9DE30872422A97987925d12a"
+	addr := "0x9Cf73Ad845075227566EdC8503DF843D529eD3b9"
 	logger := klog.With(klog.NewStdLogger(os.Stdout),
 		"ts", klog.DefaultTimestamp,
 		"caller", klog.DefaultCaller,
@@ -147,7 +147,7 @@ func TestGetHashByAddress(t *testing.T) {
 }
 
 func TestRegisterDIDByAddress(t *testing.T) {
-	addr := "0x013A08061C08E3852aBb921F305B304e0C165eB2"
+	addr := "0xe676f6A86b1eFC7471DDb76Db37aa83Ecf8406B5  "
 
 	logger := klog.With(klog.NewStdLogger(os.Stdout),
 		"ts", klog.DefaultTimestamp,
