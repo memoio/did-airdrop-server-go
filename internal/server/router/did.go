@@ -3,6 +3,7 @@ package router
 import (
 	"fmt"
 
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/gin-gonic/gin"
 )
 
@@ -10,6 +11,7 @@ func loadDIDmoudles(r *gin.RouterGroup, h *handle) {
 	r.GET("/createsigmsg", h.getCreateSigMsg)
 	r.GET("/deletesigmsg", h.getDeleteSigMsg)
 	r.POST("/create", h.createDID)
+	r.POST("/createadmin", h.createDIDByAdmin)
 	r.GET("/info", h.getDIDInfo)
 	r.POST("/delete", h.deleteDID)
 	r.POST("/addverifyinfo", h.addVerifyInfo)
@@ -55,7 +57,7 @@ func (h *handle) getCreateSigMsg(c *gin.Context) {
 func (h *handle) createDID(c *gin.Context) {
 	body := make(map[string]interface{})
 	c.BindJSON(&body)
-	_, ok := body["sig"].(string)
+	sig, ok := body["sig"].(string)
 	if !ok {
 		h.logger.Error("sig is not string", body)
 		c.JSON(ErrSignatureNull.Code, ErrSignatureNull)
@@ -69,14 +71,36 @@ func (h *handle) createDID(c *gin.Context) {
 		return
 	}
 
-	// SigByte, err := hexutil.Decode(sig)
-	// if err != nil {
-	// 	h.logger.Error(err)
-	// 	c.JSON(ErrSignature.Code, ErrSignature)
-	// 	return
-	// }
+	SigByte, err := hexutil.Decode(sig)
+	if err != nil {
+		h.logger.Error(err)
+		c.JSON(ErrSignature.Code, ErrSignature)
+		return
+	}
 
-	did, err := h.did.RegisterDIDByAddress(address)
+	SigByte[len(SigByte)-1] %= 27
+
+	did, err := h.did.RegisterDIDByAddress(address, SigByte)
+	if err != nil {
+		h.logger.Error(err)
+		c.JSON(ErrDIDCreateFailed.Code, ErrDIDCreateFailed)
+		return
+	}
+
+	c.JSON(200, CreateDIDResponse{DID: did})
+}
+
+func (h *handle) createDIDByAdmin(c *gin.Context) {
+	body := make(map[string]interface{})
+	c.BindJSON(&body)
+	address, ok := body["address"].(string)
+	if !ok {
+		h.logger.Error("address is not string", body)
+		c.JSON(ErrAddressNull.Code, ErrAddressNull)
+		return
+	}
+
+	did, err := h.did.RegisterDIDByAddressByAdmin(address)
 	if err != nil {
 		h.logger.Error(err)
 		c.JSON(ErrDIDCreateFailed.Code, ErrDIDCreateFailed)

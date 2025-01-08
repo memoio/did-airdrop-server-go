@@ -165,7 +165,7 @@ func TestRegisterDIDByAddress(t *testing.T) {
 	}
 	t.Log("did:", did.String())
 
-	didStr, err := memoDID.RegisterDIDByAddress(addr)
+	didStr, err := memoDID.RegisterDIDByAddressByAdmin(addr)
 	if err != nil {
 		t.Fatal(err)
 	}

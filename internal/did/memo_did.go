@@ -125,8 +125,42 @@ func (m *MemoDID) AddDIDNumber(address string, num int) error {
 
 	return m.db.AddNumber(did.String(), num)
 }
+func (m *MemoDID) RegisterDIDByAddress(addressStr string, sig []byte) (string, error) {
+	did, err := m.CreateDIDByAddress(addressStr)
+	if err != nil {
+		m.logger.Error(err)
+		return "", err
+	}
 
-func (m *MemoDID) RegisterDIDByAddress(addressStr string) (string, error) {
+	address := common.HexToAddress(addressStr)
+
+	num, err := m.db.GetNumber()
+	if err != nil {
+		m.logger.Error(err)
+		return "", err
+	}
+
+	m.logger.Info("register did: ", did.String(), " number: ", num)
+
+	err = m.Controller.RegisterDID(did.Identifier, m.getMethodType("address"), address.Bytes(), sig, big.NewInt(int64(num)))
+	if err != nil {
+		if strings.Contains(err.Error(), "existed") {
+			return did.String(), nil
+		}
+		m.logger.Error(err)
+		return "", err
+	}
+
+	err = m.db.AddNumber(did.String(), num)
+	if err != nil {
+		m.logger.Error(err)
+		return "", err
+	}
+
+	return did.String(), nil
+}
+
+func (m *MemoDID) RegisterDIDByAddressByAdmin(addressStr string) (string, error) {
 	did, err := m.CreateDIDByAddress(addressStr)
 	if err != nil {
 		m.logger.Error(err)

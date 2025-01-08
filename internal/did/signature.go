@@ -144,6 +144,7 @@ func (m *MemoDID) getDeleteDIDHash(did string, nonce uint64) (string, error) {
 }
 
 func (m *MemoDID) CreateDIDMessageByAddress(didI, addressStr string, nonce uint64) (string, error) {
+	m.logger.Infof("didI = %s, addressStr = %s, nonce = %d", didI, addressStr, nonce)
 	tmp8 := make([]byte, 8)
 	binary.BigEndian.PutUint64(tmp8, nonce)
 
@@ -151,18 +152,14 @@ func (m *MemoDID) CreateDIDMessageByAddress(didI, addressStr string, nonce uint6
 
 	createDID := []byte("createDID")
 	didByte := []byte(didI)
-	method := []byte(m.getMethodType("pubkey"))
+	method := []byte(m.getMethodType("address"))
 
 	message := append(createDID, didByte...)
 	message = append(message, method...)
 	message = append(message, address.Bytes()...)
 	message = append(message, tmp8...)
 
-	hash := crypto.Keccak256(
-		[]byte(message),
-	)
-
-	return hexutil.Encode(hash), nil
+	return hexutil.Encode(message), nil
 }
 
 func (m *MemoDID) getCreateDIDHashByAddress(didI, addressStr string, nonce uint64) (string, error) {
@@ -173,7 +170,7 @@ func (m *MemoDID) getCreateDIDHashByAddress(didI, addressStr string, nonce uint6
 
 	createDID := []byte("createDID")
 	didByte := []byte(didI)
-	method := []byte(m.getMethodType("pubkey"))
+	method := []byte(m.getMethodType("address"))
 
 	message := append(createDID, didByte...)
 	message = append(message, method...)

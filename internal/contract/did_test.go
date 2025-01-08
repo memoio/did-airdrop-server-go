@@ -97,7 +97,7 @@ func TestGetAddress(t *testing.T) {
 }
 
 func TestGetBalance(t *testing.T) {
-	balance, balanceErc20, err := getBalance("dev", "6ec7e0cdda802a466401c912b0dac5ff6116e4372746a455bb43c61294e6f01f")
+	balance, balanceErc20, err := getBalance("product", "34dae9c97e2cb74dd15cea8ea338230c72331596d87960c5cd768a3c51bf720a")
 	if err != nil {
 		t.Fatal(err)
 	}
