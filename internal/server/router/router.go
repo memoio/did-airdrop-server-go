@@ -4,13 +4,16 @@ import (
 	"os"
 
 	"github.com/did-server/internal/did"
+	"github.com/did-server/internal/gateway"
 	"github.com/gin-gonic/gin"
+	"github.com/go-kratos/kratos/v2/log"
 	klog "github.com/go-kratos/kratos/v2/log"
 )
 
 type handle struct {
-	logger *klog.Helper
-	did    *did.MemoDID
+	logger  *klog.Helper
+	did     *did.MemoDID
+	gateway *gateway.Mefs
 }
 
 func NewRouter(chain string, r *gin.Engine) {
@@ -25,9 +28,18 @@ func NewRouter(chain string, r *gin.Engine) {
 		panic(err)
 	}
 
-	h := &handle{
-		did:    did,
-		logger: loggers,
+	gateway, err := gateway.NewStorage(log.NewHelper(logger))
+	if err != nil {
+		log.NewHelper(logger).Error(err)
+		return
 	}
+
+	h := &handle{
+		did:     did,
+		logger:  loggers,
+		gateway: gateway,
+	}
+
 	loadDIDmoudles(r.Group("/did"), h)
+	loadMfileDIDMoudles(r.Group("/mfile"), h)
 }

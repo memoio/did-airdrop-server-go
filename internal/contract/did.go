@@ -93,6 +93,28 @@ func (c *Controller) RegisterDIDByAddress(did, method string, address, sig []byt
 	return c.CheckTx(tx.Hash(), "RegisterDID")
 }
 
+func (c *Controller) RegisterDIDByTonAdmin(did, method string, address []byte) error {
+	client, err := ethclient.DialContext(context.TODO(), c.endpoint)
+	if err != nil {
+		c.logger.Error(err)
+		return err
+	}
+
+	proxyIns, err := proxy.NewProxy(c.proxyAddr, client)
+	if err != nil {
+		c.logger.Error(err)
+		return err
+	}
+
+	tx, err := proxyIns.CreateDIDByAdmin(c.didTransactor, did, method, address, nil)
+	if err != nil {
+		c.logger.Error(err)
+		return err
+	}
+
+	return c.CheckTx(tx.Hash(), "RegisterDID")
+}
+
 func (c *Controller) DeleteDID(did string, sig []byte) error {
 	client, err := ethclient.DialContext(context.TODO(), c.endpoint)
 	if err != nil {
@@ -157,6 +179,28 @@ func (c *Controller) GetNonce(didI string) (uint64, error) {
 	}
 
 	nonce, err := proxyCaller.GetNonce(&bind.CallOpts{}, didI)
+	if err != nil {
+		c.logger.Error(err)
+		return 0, err
+	}
+
+	return nonce, nil
+}
+
+func (c *Controller) GetNonceMDID(didI string) (uint64, error) {
+	client, err := ethclient.DialContext(context.TODO(), c.endpoint)
+	if err != nil {
+		c.logger.Error(err)
+		return 0, err
+	}
+
+	proxyCaller, err := proxy.NewProxyCaller(c.proxyAddr, client)
+	if err != nil {
+		c.logger.Error(err)
+		return 0, err
+	}
+
+	nonce, err := proxyCaller.GetFileDidNonce(&bind.CallOpts{}, didI)
 	if err != nil {
 		c.logger.Error(err)
 		return 0, err

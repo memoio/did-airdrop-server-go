@@ -195,6 +195,24 @@ func (m *MemoDID) RegisterDIDByAddressByAdmin(addressStr string) (string, error)
 	return did.String(), nil
 }
 
+func (m *MemoDID) RegisterDIDByTomAdmin(addressStr string) (string, error) {
+	did, err := m.CreateDIDByAddress(addressStr)
+	if err != nil {
+		m.logger.Error(err)
+		return "", err
+	}
+
+	address := common.HexToAddress(addressStr)
+
+	err = m.Controller.RegisterDIDByTonAdmin(did.Identifier, m.getMethodType("ton"), address.Bytes())
+	if err != nil {
+		m.logger.Error(err)
+		return "", err
+	}
+
+	return did.String(), nil
+}
+
 func (m *MemoDID) RegisterDIDByPublic(publicKeyStr string, sig []byte) (string, error) {
 	did, err := m.CreateDIDByPubKey(publicKeyStr)
 	if err != nil {

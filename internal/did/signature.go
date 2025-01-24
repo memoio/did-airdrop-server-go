@@ -4,6 +4,7 @@ import (
 	"crypto/ecdsa"
 	"encoding/binary"
 	"fmt"
+	"math/big"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -162,6 +163,37 @@ func (m *MemoDID) CreateDIDMessageByAddress(didI, addressStr string, nonce uint6
 	return hexutil.Encode(message), nil
 }
 
+func (m *MemoDID) CreateMDIDMessage(mdidI, didiI string, price *big.Int) (string, error) {
+	nonce, err := m.Controller.GetNonceMDID(didiI)
+	if err != nil {
+		m.logger.Error(err)
+		return "", err
+	}
+
+	tmp8 := make([]byte, 8)
+	binary.BigEndian.PutUint64(tmp8, nonce)
+
+	tmpftype := make([]byte, 8)
+	binary.BigEndian.PutUint64(tmpftype, 0)
+
+	createDID := []byte("registerMfileDid")
+	mfileDID := []byte(mdidI)
+	encode := []byte("cid")
+	controller := []byte(didiI)
+	priceByte := price.Bytes()
+	keywordsByte := []byte{}
+
+	message := append(createDID, encode...)
+	message = append(message, mfileDID...)
+	message = append(message, tmpftype...)
+	message = append(message, controller...)
+	message = append(message, priceByte...)
+	message = append(message, tmp8...)
+	message = append(message, keywordsByte...)
+
+	return hexutil.Encode(message), nil
+}
+
 func (m *MemoDID) getCreateDIDHashByAddress(didI, addressStr string, nonce uint64) (string, error) {
 	tmp8 := make([]byte, 8)
 	binary.BigEndian.PutUint64(tmp8, nonce)
@@ -191,6 +223,8 @@ func (m *MemoDID) getMethodType(mtype string) string {
 		return "EcdsaSecp256k1RecoveryMethod2020"
 	case "pubkey":
 		return "EcdsaSecp256k1VerificationKey2019"
+	case "ton":
+		return "Ed25519VerificationKey2018"
 	default:
 		return "EcdsaSecp256k1RecoveryMethod2020"
 	}

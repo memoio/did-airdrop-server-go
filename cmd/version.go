@@ -14,3 +14,4 @@ var versionCmd = &cobra.Command{
 		fmt.Println("did server version is " + version)
 	},
 }
+ 

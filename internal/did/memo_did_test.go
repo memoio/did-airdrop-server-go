@@ -43,7 +43,7 @@ func TestGetNonce(t *testing.T) {
 		"caller", klog.DefaultCaller,
 	)
 
-	memoDID, err := NewMemoDID("dev", klog.NewHelper(logger))
+	memoDID, err := NewMemoDID("product", klog.NewHelper(logger))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -147,7 +147,7 @@ func TestGetHashByAddress(t *testing.T) {
 }
 
 func TestRegisterDIDByAddress(t *testing.T) {
-	addr := "0xe676f6A86b1eFC7471DDb76Db37aa83Ecf8406B5  "
+	addr := "0xc145A262565C746fc1596ba92b85E43F006b9566"
 
 	logger := klog.With(klog.NewStdLogger(os.Stdout),
 		"ts", klog.DefaultTimestamp,
@@ -194,7 +194,7 @@ func TestGetDIDInfo(t *testing.T) {
 }
 
 func TestGetDIDExist(t *testing.T) {
-	addr := "0x125B7b0Ed506fbF5A84372e590F206B74b5aE915"
+	addr := "0xc145A262565C746fc1596ba92b85E43F006b9566"
 	logger := klog.With(klog.NewStdLogger(os.Stdout),
 		"ts", klog.DefaultTimestamp,
 		"caller", klog.DefaultCaller,
@@ -211,4 +211,8 @@ func TestGetDIDExist(t *testing.T) {
 	}
 
 	t.Log(did)
+}
+
+func TestParseMfileDID(t *testing.T) {
+	
 }

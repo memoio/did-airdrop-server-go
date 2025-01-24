@@ -13,8 +13,8 @@ type DataBase struct {
 
 type Number struct {
 	gorm.Model
-	Did string `gorm:"unique"`
-	Num int
+	Did string `gorm:"uniqueIndex:number_composite;"`
+	Num int    `gorm:"uniqueIndex:number_composite;"`
 }
 
 func CreateDB(logger *log.Helper) (*DataBase, error) {
@@ -24,7 +24,7 @@ func CreateDB(logger *log.Helper) (*DataBase, error) {
 		return nil, err
 	}
 
-	db.AutoMigrate(&Number{})
+	db.AutoMigrate(&Number{}, &MfileInfo{})
 	return &DataBase{db: db, logger: logger}, nil
 }
 

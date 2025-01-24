@@ -10,6 +10,8 @@ var (
 	ErrAddressNull            = Error{Code: 556, Message: "Address is null"}
 	ErrSignature              = Error{Code: 557, Message: "Signature failed"}
 	ErrDIDGetInfo             = Error{Code: 558, Message: "Get DID info failed"}
+	ErrUploadFailed           = Error{Code: 559, Message: "Mfile Upload failed"}
+	ErrDownloadFailed         = Error{Code: 560, Message: "Mfile download failed"}
 )
 
 type Error struct {

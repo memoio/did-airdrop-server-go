@@ -12,6 +12,7 @@ func loadDIDmoudles(r *gin.RouterGroup, h *handle) {
 	r.GET("/deletesigmsg", h.getDeleteSigMsg)
 	r.POST("/create", h.createDID)
 	r.POST("/createadmin", h.createDIDByAdmin)
+	r.POST("/createton", h.createDIDTonByAdmin)
 	r.GET("/info", h.getDIDInfo)
 	r.POST("/delete", h.deleteDID)
 	r.POST("/addverifyinfo", h.addVerifyInfo)
@@ -101,6 +102,27 @@ func (h *handle) createDIDByAdmin(c *gin.Context) {
 	}
 
 	did, err := h.did.RegisterDIDByAddressByAdmin(address)
+	if err != nil {
+		h.logger.Error(err)
+		c.JSON(ErrDIDCreateFailed.Code, ErrDIDCreateFailed)
+		return
+	}
+
+	c.JSON(200, CreateDIDResponse{DID: did})
+}
+
+func (h *handle) createDIDTonByAdmin(c *gin.Context) {
+	body := make(map[string]interface{})
+	c.BindJSON(&body)
+
+	address, ok := body["address"].(string)
+	if !ok {
+		h.logger.Error("address is not string", body)
+		c.JSON(ErrAddressNull.Code, ErrAddressNull)
+		return
+	}
+
+	did, err := h.did.RegisterDIDByTomAdmin(address)
 	if err != nil {
 		h.logger.Error(err)
 		c.JSON(ErrDIDCreateFailed.Code, ErrDIDCreateFailed)
