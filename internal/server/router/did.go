@@ -104,7 +104,7 @@ func (h *handle) createDIDByAdmin(c *gin.Context) {
 	did, err := h.did.RegisterDIDByAddressByAdmin(address)
 	if err != nil {
 		h.logger.Error(err)
-		c.JSON(ErrDIDCreateFailed.Code, ErrDIDCreateFailed)
+		c.JSON(200, CreateDIDResponse{DID: did})
 		return
 	}
 
