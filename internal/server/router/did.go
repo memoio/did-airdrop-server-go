@@ -22,14 +22,14 @@ func loadDIDmoudles(r *gin.RouterGroup, h *handle) {
 
 }
 
-// @ Summary GetCreateSigMsg
-// @Description GetCreateSigMsg
-// @Tags DID
-// @Accept json
-// @Produce json
-// @Param address query string true "publicKey"
-// @Success 200 {object} GetSigMsgResponse
-// @Router /did/createsigmsg [get]
+// @ Summary Get Create Signature Message
+//	@Description	Get the signature message for creating a DID
+//	@Tags			DID
+//	@Accept			json
+//	@Produce		json
+//	@Param			address	query		string	true	"address"
+//	@Success		200		{object}	GetSigMsgResponse
+//	@Router			/did/createsigmsg [get]
 func (h *handle) getCreateSigMsg(c *gin.Context) {
 	address := c.Query("address")
 
@@ -44,17 +44,17 @@ func (h *handle) getCreateSigMsg(c *gin.Context) {
 	c.JSON(200, GetSigMsgResponse{Msg: msg})
 }
 
-// @ Summary CreateDID
-// @Description CreateDID
-// @Tags DID
-// @Accept json
-// @Produce json
-// @Param sig body string true "user signature"
-// @Param address body string true "user address"
-// @Success 200 {object} CreateDIDResponse
-// @Router /did/create [post]
-// @Failure 502 {object} Error
-// @Failure 503 {object} Error
+// @ Summary Create a new DID
+//	@Description	Create a new DID with user signature and address
+//	@Tags			DID
+//	@Accept			json
+//	@Produce		json
+//	@Param			sig		body		string	true	"user signature"
+//	@Param			address	body		string	true	"user address"
+//	@Success		200		{object}	CreateDIDResponse
+//	@Router			/did/create [post]
+//	@Failure		502	{object}	Error
+//	@Failure		503	{object}	Error
 func (h *handle) createDID(c *gin.Context) {
 	body := make(map[string]interface{})
 	c.BindJSON(&body)
@@ -91,6 +91,14 @@ func (h *handle) createDID(c *gin.Context) {
 	c.JSON(200, CreateDIDResponse{DID: did})
 }
 
+//	@Summary		Create a new DID By Admin
+//	@Description	Create a new DID By Admin
+//	@Tags			DID
+//	@Accept			json
+//	@Produce		json
+//	@Param			address	body		string	true	"user address"
+//	@Success		200		{object}	CreateDIDResponse
+//	@Router			/did/createadmin [post]
 func (h *handle) createDIDByAdmin(c *gin.Context) {
 	body := make(map[string]interface{})
 	c.BindJSON(&body)
@@ -111,6 +119,14 @@ func (h *handle) createDIDByAdmin(c *gin.Context) {
 	c.JSON(200, CreateDIDResponse{DID: did})
 }
 
+//	@Summary		Create a new Ton DID By Admin
+//	@Description	Create a new Ton DID By Admin
+//	@Tags			DID
+//	@Accept			json
+//	@Produce		json
+//	@Param			address	body		string	true	"user address"
+//	@Success		200		{object}	CreateDIDResponse
+//	@Router			/did/createton [post]
 func (h *handle) createDIDTonByAdmin(c *gin.Context) {
 	body := make(map[string]interface{})
 	c.BindJSON(&body)
@@ -133,14 +149,14 @@ func (h *handle) createDIDTonByAdmin(c *gin.Context) {
 }
 
 // @ Summary GetDIDInfo
-// @Description GetDIDInfo
-// @Tags DID
-// @Accept json
-// @Produce json
-// @Param address query string true "user did"
-// @Success 200 {object} GetDIDInfoResponse
-// @Router /did/info [get]
-// @Failure 503 {object} Error
+//	@Description	GetDIDInfo
+//	@Tags			DID
+//	@Accept			json
+//	@Produce		json
+//	@Param			address	query		string	true	"user did"
+//	@Success		200		{object}	GetDIDInfoResponse
+//	@Router			/did/info [get]
+//	@Failure		503	{object}	Error
 func (h *handle) getDIDInfo(c *gin.Context) {
 	address := c.Query("address")
 	if address == "" {
@@ -163,13 +179,13 @@ func (h *handle) getDIDInfo(c *gin.Context) {
 }
 
 // @ Summary GetDeleteSigMsg
-// @Description GetDeleteSigMsg
-// @Tags DID
-// @Accept json
-// @Produce json
-// @Param did query string true "user did"
-// @Success 200 {object} GetSigMsgResponse
-// @Router /did/deletesigmsg [get]
+//	@Description	GetDeleteSigMsg
+//	@Tags			DID
+//	@Accept			json
+//	@Produce		json
+//	@Param			did	query		string	true	"user did"
+//	@Success		200	{object}	GetSigMsgResponse
+//	@Router			/did/deletesigmsg [get]
 func (h *handle) getDeleteSigMsg(c *gin.Context) {
 	did := c.Query("did")
 	if did == "" {
@@ -188,13 +204,13 @@ func (h *handle) getDeleteSigMsg(c *gin.Context) {
 }
 
 // @ Summary GetDIDExist
-// @Description GetDIDExist
-// @Tags DID
-// @Accept json
-// @Produce json
-// @Param address query string true "user address"
-// @Success 200 {object} string
-// @Router /did/exist [get]
+//	@Description	GetDIDExist
+//	@Tags			DID
+//	@Accept			json
+//	@Produce		json
+//	@Param			address	query		string	true	"user address"
+//	@Success		200		{object}	string
+//	@Router			/did/exist [get]
 func (h *handle) getDIDExist(c *gin.Context) {
 	address := c.Query("address")
 	if address == "" {
@@ -217,16 +233,16 @@ func (h *handle) getDIDExist(c *gin.Context) {
 }
 
 // @ Summary DeleteDID
-// @Description DeleteDID
-// @Tags DID
-// @Accept json
-// @Produce json
-// @Param sig body string true "user signature"
-// @Param did body string true "did"
-// @Success 200 {object} DeleteDIDResponse
-// @Router /did/delete [post]
-// @Failure 502 {object} Error
-// @Failure 504 {object} Error
+//	@Description	DeleteDID
+//	@Tags			DID
+//	@Accept			json
+//	@Produce		json
+//	@Param			sig	body		string	true	"user signature"
+//	@Param			did	body		string	true	"did"
+//	@Success		200	{object}	DeleteDIDResponse
+//	@Router			/did/delete [post]
+//	@Failure		502	{object}	Error
+//	@Failure		504	{object}	Error
 func (h *handle) deleteDID(c *gin.Context) {
 	body := make(map[string]interface{})
 	c.BindJSON(&body)

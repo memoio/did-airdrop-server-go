@@ -22,7 +22,7 @@ func loadMfileDIDMoudles(r *gin.RouterGroup, h *handle) {
 }
 
 // @Summary		UploadCreate
-// @Description	UploadCreate
+// @Description	create upload request get msg to sign
 // @Tags			mfile
 // @Accept			json
 // @Produce		json
@@ -111,7 +111,7 @@ func (h *handle) uploadCreate(c *gin.Context) {
 }
 
 // @Summary		UploadConfirm
-// @Description	UploadConfirm
+// @Description	upload confirm with sig
 // @Tags			mfile
 // @Accept			json
 // @Produce		json
@@ -145,7 +145,7 @@ func (h *handle) uploadConfirm(c *gin.Context) {
 }
 
 // @Summary		Download
-// @Description	Download
+// @Description	download file by mdid
 // @Tags			mfile
 // @Accept			json
 // @Produce		json

@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/did/create": {
             "post": {
-                "description": "CreateDID",
+                "description": "Create a new DID with user signature and address",
                 "consumes": [
                     "application/json"
                 ],
@@ -69,9 +69,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/did/createadmin": {
+            "post": {
+                "description": "Create a new DID By Admin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "DID"
+                ],
+                "summary": "Create a new DID By Admin",
+                "parameters": [
+                    {
+                        "description": "user address",
+                        "name": "address",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/router.CreateDIDResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/did/createsigmsg": {
             "get": {
-                "description": "GetCreateSigMsg",
+                "description": "Get the signature message for creating a DID",
                 "consumes": [
                     "application/json"
                 ],
@@ -84,7 +118,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "publicKey",
+                        "description": "address",
                         "name": "address",
                         "in": "query",
                         "required": true
@@ -95,6 +129,40 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/router.GetSigMsgResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/did/createton": {
+            "post": {
+                "description": "Create a new Ton DID By Admin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "DID"
+                ],
+                "summary": "Create a new Ton DID By Admin",
+                "parameters": [
+                    {
+                        "description": "user address",
+                        "name": "address",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/router.CreateDIDResponse"
                         }
                     }
                 }
@@ -252,6 +320,131 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/mfile/download": {
+            "get": {
+                "description": "download file by mdid",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mfile"
+                ],
+                "summary": "Download",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "mdid",
+                        "name": "mdid",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "address",
+                        "name": "address",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/mfile/upload/confirm": {
+            "post": {
+                "description": "upload confirm with sig",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mfile"
+                ],
+                "summary": "UploadConfirm",
+                "parameters": [
+                    {
+                        "description": "sig",
+                        "name": "sig",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "address",
+                        "name": "address",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/mfile/upload/create": {
+            "post": {
+                "description": "create upload request get msg to sign",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mfile"
+                ],
+                "summary": "UploadCreate",
+                "parameters": [
+                    {
+                        "description": "data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "address",
+                        "name": "address",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -331,7 +524,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "DID-Server API",
-	Description:      "This is a did server.",
+	Description:      "1. get createsigmsg\n2. create/createadmin (createadmin is free and not need createsigmsg)\n3. exist (confirm did exist)\n4. info (get did info)",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

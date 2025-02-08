@@ -42,4 +42,5 @@ func NewRouter(chain string, r *gin.Engine) {
 
 	loadDIDmoudles(r.Group("/did"), h)
 	loadMfileDIDMoudles(r.Group("/mfile"), h)
+	loadFileMoudles(r.Group("/file"), h)
 }

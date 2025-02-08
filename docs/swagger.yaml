@@ -45,7 +45,11 @@ definitions:
 host: localhost:8080
 info:
   contact: {}
-  description: This is a did server.
+  description: |-
+    1. get createsigmsg
+    2. create/createadmin (createadmin is free and not need createsigmsg)
+    3. exist (confirm did exist)
+    4. info (get did info)
   title: DID-Server API
   version: "1.0"
 paths:
@@ -53,7 +57,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: CreateDID
+      description: Create a new DID with user signature and address
       parameters:
       - description: user signature
         in: body
@@ -84,13 +88,35 @@ paths:
             $ref: '#/definitions/router.Error'
       tags:
       - DID
+  /did/createadmin:
+    post:
+      consumes:
+      - application/json
+      description: Create a new DID By Admin
+      parameters:
+      - description: user address
+        in: body
+        name: address
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.CreateDIDResponse'
+      summary: Create a new DID By Admin
+      tags:
+      - DID
   /did/createsigmsg:
     get:
       consumes:
       - application/json
-      description: GetCreateSigMsg
+      description: Get the signature message for creating a DID
       parameters:
-      - description: publicKey
+      - description: address
         in: query
         name: address
         required: true
@@ -102,6 +128,28 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/router.GetSigMsgResponse'
+      tags:
+      - DID
+  /did/createton:
+    post:
+      consumes:
+      - application/json
+      description: Create a new Ton DID By Admin
+      parameters:
+      - description: user address
+        in: body
+        name: address
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.CreateDIDResponse'
+      summary: Create a new Ton DID By Admin
       tags:
       - DID
   /did/delete:
@@ -203,4 +251,86 @@ paths:
             $ref: '#/definitions/router.Error'
       tags:
       - DID
+  /mfile/download:
+    get:
+      consumes:
+      - application/json
+      description: download file by mdid
+      parameters:
+      - description: mdid
+        in: query
+        name: mdid
+        required: true
+        type: string
+      - description: address
+        in: query
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Download
+      tags:
+      - mfile
+  /mfile/upload/confirm:
+    post:
+      consumes:
+      - application/json
+      description: upload confirm with sig
+      parameters:
+      - description: sig
+        in: body
+        name: sig
+        required: true
+        schema:
+          type: string
+      - description: address
+        in: body
+        name: address
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: UploadConfirm
+      tags:
+      - mfile
+  /mfile/upload/create:
+    post:
+      consumes:
+      - application/json
+      description: create upload request get msg to sign
+      parameters:
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          type: string
+      - description: address
+        in: body
+        name: address
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: UploadCreate
+      tags:
+      - mfile
 swagger: "2.0"

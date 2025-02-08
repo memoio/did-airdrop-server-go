@@ -12,6 +12,7 @@ var (
 	ErrDIDGetInfo             = Error{Code: 558, Message: "Get DID info failed"}
 	ErrUploadFailed           = Error{Code: 559, Message: "Mfile Upload failed"}
 	ErrDownloadFailed         = Error{Code: 560, Message: "Mfile download failed"}
+	ErrParamsInvalid          = Error{Code: 561, Message: "Params invalid"}
 )
 
 type Error struct {
